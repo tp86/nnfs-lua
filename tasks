@@ -1,0 +1,26 @@
+#!/bin/bash
+
+srcdir="src"
+luaversion="5.4"
+luarocksflags="--lua-version ${luaversion}"
+luarocks="luarocks ${luarocksflags}"
+lua="lua"
+
+function setpath {
+  $(${luarocks} path)
+  LUA_PATH="./${srcdir}/?.lua;./${srcdir}/?/init.lua;$LUA_PATH"
+}
+
+function run {
+  setpath
+  "${lua}" ${srcdir}/"$1"
+}
+
+function default {
+  run $@
+}
+
+task="${1//--/}"
+shift
+
+${task:-default} $@
