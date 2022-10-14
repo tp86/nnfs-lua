@@ -13,14 +13,14 @@ function setpath {
 
 function run {
   setpath
-  "${lua}" ${srcdir}/"$1"
+  "${lua}" "$1"
 }
 
 function default {
   run $@
 }
 
-task="${1//--/}"
+task="${1}"
 shift
 
 ${task:-default} $@
