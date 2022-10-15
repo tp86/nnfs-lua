@@ -22,4 +22,20 @@ function m.izip(...)
   return iter
 end
 
+function m.dot(v1, v2)
+  local dot = 0
+  for e1, e2 in m.izip(v1, v2) do
+    dot = dot + e1 * e2
+  end
+  return dot
+end
+
+function m.add(v1, v2)
+  local sumv = {}
+  for e1, e2 in m.izip(v1, v2) do
+    sumv[#sumv+1] = e1 + e2
+  end
+  return sumv
+end
+
 return m
