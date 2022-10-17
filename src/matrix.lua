@@ -45,6 +45,17 @@ function M.add(m1, m2)
   return m
 end
 
+function M.addv(m, v)
+  -- TODO assert shapes
+  local ma = { rows = m.rows, cols = m.cols }
+  local vi = 1
+  for i = 1, #m do
+    ma[#ma+1] = m[i] + v[vi]
+    vi = vi % #v + 1
+  end
+  return ma
+end
+
 function M.dot(m1, m2)
   -- TODO assert shapes
   local m = { rows = m1.rows, cols = m2.cols }

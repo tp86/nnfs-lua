@@ -13,6 +13,6 @@ local weights = mat.fromtable{
 }
 local biases = { 2, 3, 0.5 }
 
-local outputs = mat.dotT(inputs, weights)
+local outputs = mat.addv(mat.dotT(inputs, weights), biases)
 
 mat.print(outputs)
