@@ -12,7 +12,21 @@ local weights = mat.fromtable{
   { -0.26, -0.27, 0.17, 0.87 },
 }
 local biases = { 2, 3, 0.5 }
+local weights2 = mat.fromtable{
+  { 0.1, -0.14, 0.5 },
+  { -0.5, 0.12, -0.33 },
+  { -0.44, 0.73, -0.13 },
+}
+local biases2 = { -1, 2, -0.5 }
 
-local outputs = mat.addv(mat.dotT(inputs, weights), biases)
+local function layeroutputs(weights, biases, inputs)
+  return mat.addv(mat.dotT(inputs, weights), biases)
+end
 
-mat.print(outputs)
+local s = os.clock()
+local l1outputs = layeroutputs(weights, biases, inputs)
+local l2outputs = layeroutputs(weights2, biases2, l1outputs)
+local e = os.clock()
+print(e - s)
+
+mat.print(l2outputs)
