@@ -63,10 +63,27 @@ function M.dot(m1, m2)
   return m
 end
 
+function M.dotT(m1, m2)
+  -- TODO assert shapes are same
+  local m = { rows = m1.rows, cols = m2.rows }
+  for r1 = 1, m1.rows do
+    local r1offset = (r1 - 1) * m1.cols
+    for r2 = 1, m2.rows do
+      local r2offset = (r2 - 1) * m2.cols
+      local dot = 0
+      for c = 1, m1.cols do
+        dot = dot + m1[r1offset + c] * m2[r2offset + c]
+      end
+      m[#m+1] = dot
+    end
+  end
+  return m
+end
+
 function M.print(m)
   for i, v in ipairs(m) do
     local c = (i - 1) % m.cols + 1
-    io.write(string.format("%0.2f ", v))
+    io.write(string.format("% 0.3f ", v))
     if c == m.cols then
       io.write('\n')
     end
