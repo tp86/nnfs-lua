@@ -1,32 +1,42 @@
 local mat = require('matrix')
 
-local inputs = mat.fromtable{
-  { 1, 2, 3, 2.5 },
-  { 2, 5, -1, 2 },
-  { -1.5, 2.7, 3.3, -0.8 },
+local RootObj = {
+  new = function(self, obj)
+    obj = obj or {}
+    self.__index = self
+    setmetatable(obj, self)
+    return obj
+  end,
 }
 
-local weights = mat.fromtable{
-  { 0.2, 0.8, -0.5, 1.0 },
-  { 0.5, -0.91, 0.26, -0.5 },
-  { -0.26, -0.27, 0.17, 0.87 },
-}
-local biases = { 2, 3, 0.5 }
-local weights2 = mat.fromtable{
-  { 0.1, -0.14, 0.5 },
-  { -0.5, 0.12, -0.33 },
-  { -0.44, 0.73, -0.13 },
-}
-local biases2 = { -1, 2, -0.5 }
-
-local function layeroutputs(weights, biases, inputs)
-  return mat.addv(mat.dotT(inputs, weights), biases)
+local function gaussian(mean, variance)
+  return math.sqrt(-2 * variance * math.log(math.random())) *
+      math.cos(2 * math.pi * math.random()) + mean
 end
 
-local s = os.clock()
-local l1outputs = layeroutputs(weights, biases, inputs)
-local l2outputs = layeroutputs(weights2, biases2, l1outputs)
-local e = os.clock()
-print(e - s)
+local M = {}
 
-mat.print(l2outputs)
+local function forward(self, inputs)
+  self.outputs = mat.addv(mat.dotT(inputs, self.weights), self.biases)
+end
+
+M.LayerDense = function(ninputs, nneurons)
+  local weights = {}
+  for n = 1, nneurons do
+    weights[n] = {}
+    for i = 1, ninputs do
+      weights[n][i] = 0.01 * gaussian(0, 1)
+    end
+  end
+  local biases = {}
+  for n = 1, nneurons do
+    biases[n] = 0
+  end
+  return RootObj:new {
+    weights = mat.fromtable(weights),
+    biases = biases,
+    forward = forward,
+  }
+end
+
+return M
