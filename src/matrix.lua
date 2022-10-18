@@ -10,12 +10,15 @@ local M = {}
 --end
 
 function M.fromtable(t)
-  -- TODO ensure shape
-  local rows = #t
-  local cols = #t[1]
+  assert(type(t) == "table")
+  local rows = #t or 0
+  local cols = #t[1] or 0
   local data = {}
   for r = 1, rows do
+    assert(#t[r] == cols)
     for c = 1, cols do
+      local e = t[r][c]
+      assert(type(e) ~= 'table')
       data[#data+1] = t[r][c]
     end
   end
@@ -37,7 +40,7 @@ function M.transpose(m)
 end
 
 function M.add(m1, m2)
-  -- TODO assert shapes are same
+  assert(m1.rows == m2.rows and m1.cols == m2.cols)
   local m = { rows = m1.rows, cols = m2.cols }
   for i = 1, #m1 do
     m[i] = m1[i] + m2[i]
@@ -46,7 +49,7 @@ function M.add(m1, m2)
 end
 
 function M.addv(m, v)
-  -- TODO assert shapes
+  assert(m.cols == #v)
   local ma = { rows = m.rows, cols = m.cols }
   local vi = 1
   for i = 1, #m do
@@ -57,7 +60,7 @@ function M.addv(m, v)
 end
 
 function M.dot(m1, m2)
-  -- TODO assert shapes
+  assert(m1.cols == m2.rows)
   local m = { rows = m1.rows, cols = m2.cols }
   for r = 1, m1.rows do
     local r1 = r - 1
@@ -75,7 +78,7 @@ function M.dot(m1, m2)
 end
 
 function M.dotT(m1, m2)
-  -- TODO assert shapes are same
+  assert(m1.cols == m2.cols)
   local m = { rows = m1.rows, cols = m2.rows }
   for r1 = 1, m1.rows do
     local r1offset = (r1 - 1) * m1.cols

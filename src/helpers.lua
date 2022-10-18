@@ -1,38 +1,22 @@
 local M = {}
 
-function M.izip(t1, t2)
-  local i = 1
-  local function iter()
-    local e1, e2 = t1[i], t2[i]
-    i = i + 1
-    return e1, e2
-  end
-
-  return iter
-end
-
-function M.vdot(v1, v2)
-  local dot = 0
-  for e1, e2 in M.izip(v1, v2) do
-    dot = dot + e1 * e2
-  end
-  return dot
-end
-
-function M.mdot(m, v)
-  local dot = {}
-  for _, v1 in ipairs(m) do
-    dot[#dot+1] = M.vdot(v1, v)
-  end
-  return dot
-end
-
-function M.add(v1, v2)
-  local sumv = {}
-  for e1, e2 in M.izip(v1, v2) do
-    sumv[#sumv+1] = e1 + e2
-  end
-  return sumv
+function M.readfile(filename, pointdims)
+  local file = assert(io.open(filename, 'r'))
+  local data = {}
+  local pointsize = 4 * (pointdims or 1)
+  local point = file:read(pointsize)
+  local unpackfmt = string.rep('f', (pointdims or 1))
+  repeat
+    local pointdata = table.pack(string.unpack(unpackfmt, point))
+    table.remove(pointdata)
+    if not pointdims then
+      pointdata = table.unpack(pointdata)
+    end
+    data[#data+1] = pointdata
+    point = file:read(pointsize)
+  until not point
+  file:close()
+  return data
 end
 
 return M
