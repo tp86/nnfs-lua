@@ -39,4 +39,10 @@ M.LayerDense = class{
   end,
 }
 
+M.ActivationReLU = class{
+  forward = function(self, inputs)
+    self.outputs = mat.max(0, inputs)
+  end,
+}
+
 return M

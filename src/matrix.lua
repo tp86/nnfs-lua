@@ -52,7 +52,7 @@ function M.addv(m, v)
   assert(m.cols == #v)
   local ma = { rows = m.rows, cols = m.cols }
   local vi = 1
-  for i = 1, #m do
+  for i = 1, m.rows * m.cols do
     ma[#ma + 1] = m[i] + v[vi]
     vi = vi % #v + 1
   end
@@ -92,6 +92,14 @@ function M.dotT(m1, m2)
     end
   end
   return m
+end
+
+function M.max(value, m)
+  local res = { rows = m.rows, cols = m.cols }
+  for i = 1, m.rows * m.cols do
+    res[i] = math.max(value, m[i])
+  end
+  return res
 end
 
 function M.print(m, from, to)

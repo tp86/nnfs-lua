@@ -6,11 +6,14 @@ local mat = require('matrix')
 local X = mat.fromtable(X100data)
 
 local LayerDense = require('neuron').LayerDense
+local ActivationReLU = require('neuron').ActivationReLU
 
 local layer1 = LayerDense(2, 3)
+local activation1 = ActivationReLU()
 local s = os.clock()
 layer1:forward(X)
+activation1:forward(layer1.outputs)
 local e = os.clock()
 print(e - s)
 
-mat.print(layer1.outputs, 1, 5)
+mat.print(activation1.outputs, 1, 5)
