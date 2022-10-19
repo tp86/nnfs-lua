@@ -19,7 +19,7 @@ function M.fromtable(t)
     for c = 1, cols do
       local e = t[r][c]
       assert(type(e) ~= 'table')
-      data[#data+1] = t[r][c]
+      data[#data + 1] = t[r][c]
     end
   end
   data.rows = rows
@@ -33,7 +33,7 @@ function M.transpose(m)
   for c = 1, m.cols do
     for r = 1, m.rows do
       i = (r - 1) * m.cols + c
-      mt[#mt+1] = m[i]
+      mt[#mt + 1] = m[i]
     end
   end
   return mt
@@ -53,7 +53,7 @@ function M.addv(m, v)
   local ma = { rows = m.rows, cols = m.cols }
   local vi = 1
   for i = 1, #m do
-    ma[#ma+1] = m[i] + v[vi]
+    ma[#ma + 1] = m[i] + v[vi]
     vi = vi % #v + 1
   end
   return ma
@@ -88,18 +88,23 @@ function M.dotT(m1, m2)
       for c = 1, m1.cols do
         dot = dot + m1[r1offset + c] * m2[r2offset + c]
       end
-      m[#m+1] = dot
+      m[#m + 1] = dot
     end
   end
   return m
 end
 
-function M.print(m)
+function M.print(m, from, to)
+  from = from or 1
+  to = to or m.rows
+  local row = from
   for i, v in ipairs(m) do
     local c = (i - 1) % m.cols + 1
-    io.write(string.format("% 0.3f ", v))
+    io.write(string.format("% 0.3e ", v))
     if c == m.cols then
       io.write('\n')
+      if row >= to then break end
+      row = row + 1
     end
   end
 end
