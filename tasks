@@ -8,6 +8,7 @@ lua="lua"
 
 function setpath {
   $(${luarocks} path)
+  LUA_PATH_5_4="./${srcdir}/?.lua;./${srcdir}/?/init.lua;$LUA_PATH_5_4"
   LUA_PATH="./${srcdir}/?.lua;./${srcdir}/?/init.lua;$LUA_PATH"
 }
 
