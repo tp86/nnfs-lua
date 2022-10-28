@@ -28,3 +28,15 @@ local function printoutputs(outputs, rows, cols)
 end
 
 printoutputs(layer2.outputs, 5, layer2.neurons)
+
+local function argmax(t)
+  local maxindex
+  local maxvalue
+  for i, v in ipairs(t) do
+    if v > (maxvalue or -math.huge) then
+      maxvalue = v
+      maxindex = i
+    end
+  end
+  return maxindex, maxvalue
+end
