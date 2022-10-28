@@ -5,28 +5,31 @@ local y100data = readfile('data/y100.data')
 local mat = require('matrix')
 local X = mat.fromtable(X100data)
 
-local LayerDense = require('neuron').LayerDense
-local ActivationReLU = require('neuron').ActivationReLU
+local LayerDense = require('neuron').Layer.Dense
+local ReLU = require('neuron').Activation.ReLU
+local Softmax = require('neuron').Activation.Softmax
 
 local layer1 = LayerDense(2, 3)
-local activation1 = ActivationReLU()
+local activation1 = ReLU()
+local layer2 = LayerDense(3, 3)
+local activation2 = Softmax()
 local s = os.clock()
 --for _ = 1, 10000 do
-  layer1:forward(X)
-  activation1:forward(layer1.outputs)
+layer1:forward(X)
+activation1:forward(layer1.outputs)
+layer2:forward(activation1.outputs)
+activation2:forward(layer2.outputs, layer2.neurons)
 --end
 local e = os.clock()
 print(e - s)
 
-local opt = require('optimized')
-local layeropt = opt.LayerDense(2, 3)
-s = os.clock()
---for _ = 1, 10000 do
-  layeropt:forward(X)
---end
-e = os.clock()
-print(e - s)
+local function printoutputs(outputs, rows, cols)
+  for index = 1, rows * cols do
+    io.write(string.format("% 0.7e ", outputs[index]))
+    if index % cols == 0 then
+      io.write('\n')
+    end
+  end
+end
 
-mat.print(activation1.outputs, 1, 5)
-layeropt.outputs.cols = layeropt.neurons
-mat.print(layeropt.outputs, 1, 5)
+printoutputs(activation2.outputs, 5, layer2.neurons)
