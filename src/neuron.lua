@@ -22,6 +22,7 @@ local function makeLayerDenseClass()
     end
     return weights
   end
+
   local function initbiases(nneurons)
     local biases = {}
     for n = 1, nneurons do
@@ -29,12 +30,14 @@ local function makeLayerDenseClass()
     end
     return biases
   end
-  return class{
-    [init] = function(self, ninputs, nneurons, weights, biases)
+
+  return class {
+    [init] = function(self, ninputs, nneurons, activationfn, weights, biases)
       self.inputs = ninputs
       self.neurons = nneurons
       self.weights = weights or initweights(ninputs, nneurons)
       self.biases = biases or initbiases(nneurons)
+      self.activationfn = activationfn or M.Activation.ReLU
     end,
     forward = function(self, inputs)
       local outputs = self.outputs or {}
@@ -53,59 +56,54 @@ local function makeLayerDenseClass()
           neuronoffset = neuronoffset + self.inputs
         end
       end
+      self:activationfn(outputs)
       self.outputs = outputs
     end,
   }
 end
+
 M.Layer.Dense = makeLayerDenseClass()
 
-M.Activation.ReLU = class{
-  forward = function(self, inputs)
-    local outputs = self.outputs or {}
-    for i, v in ipairs(inputs) do
-      if v > 0 then
-        outputs[i] = v
-      else
-        outputs[i] = 0
-      end
+M.Activation.ReLU = function(_, data)
+  for i, v in ipairs(data) do
+    if v > 0 then
+      data[i] = v
+    else
+      data[i] = 0
     end
-    self.outputs = outputs
-  end,
-}
+  end
+end
 
 local exp = math.exp
-M.Activation.Softmax = class{
-  forward = function(self, inputs, inputspersample)
-    local outputs = self.outputs or {}
-    local neuronoutputsmax = -math.huge
-    local neuronoutputssum = 0
-    local expvalue = 0
-    local index = 0
-    for sampleoffset = 0, #inputs - 1, inputspersample do
-      neuronoutputsmax = -math.huge
-      neuronoutputssum = 0
-      -- first pass - find max
-      for inputindex = 1, inputspersample do
-        local value = inputs[sampleoffset + inputindex]
-        if value > neuronoutputsmax then
-          neuronoutputsmax = value
-        end
-      end
-      -- second pass - exponentiate and sum
-      for inputindex = 1, inputspersample do
-        index = sampleoffset + inputindex
-        expvalue = exp(inputs[index] - neuronoutputsmax)
-        neuronoutputssum = neuronoutputssum + expvalue
-        outputs[index] = expvalue
-      end
-      -- third pass - divide by sum
-      for inputindex = 1, inputspersample do
-        index = sampleoffset + inputindex
-        outputs[index] = outputs[index] / neuronoutputssum
+M.Activation.Softmax = function(self, data)
+  local inputspersample = self.neurons
+  local neuronoutputsmax = -math.huge
+  local neuronoutputssum = 0
+  local expvalue = 0
+  local index = 0
+  for sampleoffset = 0, #data - 1, inputspersample do
+    neuronoutputsmax = -math.huge
+    neuronoutputssum = 0
+    -- first pass - find max
+    for inputindex = 1, inputspersample do
+      local value = data[sampleoffset + inputindex]
+      if value > neuronoutputsmax then
+        neuronoutputsmax = value
       end
     end
-    self.outputs = outputs
-  end,
-}
+    -- second pass - exponentiate and sum
+    for inputindex = 1, inputspersample do
+      index = sampleoffset + inputindex
+      expvalue = exp(data[index] - neuronoutputsmax)
+      neuronoutputssum = neuronoutputssum + expvalue
+      data[index] = expvalue
+    end
+    -- third pass - divide by sum
+    for inputindex = 1, inputspersample do
+      index = sampleoffset + inputindex
+      data[index] = data[index] / neuronoutputssum
+    end
+  end
+end
 
 return M

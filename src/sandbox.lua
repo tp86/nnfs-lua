@@ -6,19 +6,14 @@ local mat = require('matrix')
 local X = mat.fromtable(X100data)
 
 local LayerDense = require('neuron').Layer.Dense
-local ReLU = require('neuron').Activation.ReLU
 local Softmax = require('neuron').Activation.Softmax
 
 local layer1 = LayerDense(2, 3)
-local activation1 = ReLU()
-local layer2 = LayerDense(3, 3)
-local activation2 = Softmax()
+local layer2 = LayerDense(3, 3, Softmax)
 local s = os.clock()
 --for _ = 1, 10000 do
 layer1:forward(X)
-activation1:forward(layer1.outputs)
-layer2:forward(activation1.outputs)
-activation2:forward(layer2.outputs, layer2.neurons)
+layer2:forward(layer1.outputs)
 --end
 local e = os.clock()
 print(e - s)
@@ -32,4 +27,4 @@ local function printoutputs(outputs, rows, cols)
   end
 end
 
-printoutputs(activation2.outputs, 5, layer2.neurons)
+printoutputs(layer2.outputs, 5, layer2.neurons)
